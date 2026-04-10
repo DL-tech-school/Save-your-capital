@@ -217,3 +217,286 @@
 
     .sections {
       display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .section { padding: 20px; }
+    .section h2 { margin: 0 0 8px; font-size: 24px; }
+    .section p { margin: 0 0 16px; color: var(--muted); line-height: 1.45; }
+
+    .three {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .field { display: grid; gap: 7px; }
+    .field label { font-size: 13px; color: var(--muted); }
+
+    .profit { color: var(--green); }
+    .loss { color: var(--red); }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .sections, .grid, .three { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="panel hero-main">
+        <div class="badge">⛈️ Cambridge Storm Crisis</div>
+        <h1>Збережи свої €1000</h1>
+        <div class="sub">
+          У Кембриджі почався шторм! Тобі потрібно терміново вирішити, як врятувати капітал. 
+          Розподіли <strong>€1000</strong> між трьома секторами. Пиши в чат цифри через слеш (наприклад: 500/200/300).
+        </div>
+        <div class="actions">
+          <button class="primary" id="startBtn">Почати симуляцію</button>
+          <button class="secondary" id="resetBtn">Скинути все</button>
+        </div>
+      </div>
+
+      <div class="panel hero-side">
+        <div class="stat">
+          <div class="stat-label">Початковий капітал</div>
+          <div class="stat-value">€1000</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Вартість кошиків</div>
+          <div class="stat-value" id="portfolioValue">€0.00</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Результат</div>
+          <div class="stat-value" id="profitValue">€0.00</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel coin-card" style="outline: 1px solid rgba(255, 209, 102, 0.3);">
+        <div class="coin-head">
+          <div class="coin-name"><span class="coin-emoji">📀</span> Золото та готівка</div>
+        </div>
+        <div class="coin-type">Ваш "сейф" на випадок кризи. Найвища стабільність, мінімальні коливання.</div>
+        <div class="field">
+          <label for="safeInput">Вкласти, €</label>
+          <input type="number" id="safeInput" placeholder="0">
+        </div>
+        <div class="row"><div class="label">Зараз у кошику</div><div class="value" id="safeCurrent">€0.00</div></div>
+        <div class="row"><div class="label">Ефект шторму</div><div class="value" id="safeChange">0%</div></div>
+      </div>
+
+      <div class="panel coin-card" style="outline: 1px solid rgba(76, 201, 240, 0.3);">
+        <div class="coin-head">
+          <div class="coin-name"><span class="coin-emoji">🏭</span> Енергетика та їжа</div>
+        </div>
+        <div class="coin-type">Сектори, що потрібні завжди. Стабільність та повільний, але впевнений ріст.</div>
+        <div class="field">
+          <label for="trendInput">Вкласти, €</label>
+          <input type="number" id="trendInput" placeholder="0">
+        </div>
+        <div class="row"><div class="label">Зараз у кошику</div><div class="value" id="trendCurrent">€0.00</div></div>
+        <div class="row"><div class="label">Ефект шторму</div><div class="value" id="trendChange">0%</div></div>
+      </div>
+
+      <div class="panel coin-card" style="outline: 1px solid rgba(255, 119, 200, 0.3);">
+        <div class="coin-head">
+          <div class="coin-name"><span class="coin-emoji">🤖</span> IT & AI</div>
+        </div>
+        <div class="coin-type">Високий ризик, але космічний прибуток. Може злетіти або впасти через одну новину.</div>
+        <div class="field">
+          <label for="riskyInput">Вкласти, €</label>
+          <input type="number" id="riskyInput" placeholder="0">
+        </div>
+        <div class="row"><div class="label">Зараз у кошику</div><div class="value" id="riskyCurrent">€0.00</div></div>
+        <div class="row"><div class="label">Ефект шторму</div><div class="value" id="riskyChange">0%</div></div>
+      </div>
+    </div>
+
+    <div class="sections">
+      <div class="panel section">
+        <h2>📊 Події шторму</h2>
+        <p>Викладач оголошує новину. Введи відсоток зміни для секторів (наприклад: <strong>10</strong> або <strong>-20</strong>).</p>
+        <div class="three">
+          <div class="field"><label>Золото, %</label><input type="number" id="safePercent" placeholder="0"></div>
+          <div class="field"><label>Енерго, %</label><input type="number" id="trendPercent" placeholder="0"></div>
+          <div class="field"><label>IT, %</label><input type="number" id="riskyPercent" placeholder="0"></div>
+        </div>
+        <button class="primary" id="applyEventBtn">Оновити ринок</button>
+      </div>
+
+      <div class="panel section">
+        <h2>🔄 Ребалансування</h2>
+        <p>Перекинь капітал між кошиками, щоб мінімізувати збитки або максимізувати прибуток.</p>
+        <div class="three">
+          <div class="field">
+            <label>Звідки</label>
+            <select id="fromCoin">
+              <option value="safe">Золото</option>
+              <option value="trend">Енерго</option>
+              <option value="risky">IT & AI</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Куди</label>
+            <select id="toCoin">
+              <option value="trend">Енерго</option>
+              <option value="safe">Золото</option>
+              <option value="risky">IT & AI</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Сума, €</label>
+            <input type="number" id="transferAmount" placeholder="100">
+          </div>
+        </div>
+        <button class="primary" id="transferBtn">Переказати кошти</button>
+      </div>
+    </div>
+
+    <div class="panel section" style="margin-top:18px;">
+      <h2>📈 Фінансовий звіт</h2>
+      <div class="result-line"><span>Золото та готівка</span><strong id="sumSafe">€0.00</strong></div>
+      <div class="result-line"><span>Енергетика та їжа</span><strong id="sumTrend">€0.00</strong></div>
+      <div class="result-line"><span>IT & AI</span><strong id="sumRisky">€0.00</strong></div>
+      <div class="result-line"><span>Загальний капітал</span><strong id="sumPortfolio">€0.00</strong></div>
+      <div class="result-line"><span>Чистий прибуток/збиток</span><strong id="sumProfit">€0.00</strong></div>
+      <div class="result-line"><span>Доступно для розподілу</span><strong id="cashLeft">€1000.00</strong></div>
+    </div>
+
+    <div class="footer-note">
+      Механіка: Спочатку розподіліть суму, натисніть "Почати", а потім застосовуйте зміни ринку за вказівкою модератора.
+    </div>
+  </div>
+
+  <script>
+    const KEY = 'cambridgeStormState';
+    const START_BALANCE = 1000;
+
+    let state = loadState();
+
+    function loadState() {
+      const raw = sessionStorage.getItem(KEY);
+      if (!raw) return {
+        started: false,
+        coins: {
+          safe: { invested: 0, current: 0, lastChange: 0 },
+          trend: { invested: 0, current: 0, lastChange: 0 },
+          risky: { invested: 0, current: 0, lastChange: 0 }
+        }
+      };
+      return JSON.parse(raw);
+    }
+
+    function saveState() { sessionStorage.setItem(KEY, JSON.stringify(state)); }
+    function formatMoney(n) { return `€${Number(n).toFixed(2)}`; }
+    function totalInvested() { return state.coins.safe.invested + state.coins.trend.invested + state.coins.risky.invested; }
+    function totalCurrent() { return state.coins.safe.current + state.coins.trend.current + state.coins.risky.current; }
+    function cashRemaining() { return START_BALANCE - totalInvested(); }
+
+    function updateAllocation() {
+      if (state.started) return;
+      state.coins.safe.invested = Math.max(0, Number(document.getElementById('safeInput').value || 0));
+      state.coins.trend.invested = Math.max(0, Number(document.getElementById('trendInput').value || 0));
+      state.coins.risky.invested = Math.max(0, Number(document.getElementById('riskyInput').value || 0));
+      
+      if (totalInvested() > START_BALANCE) {
+        alert('Сума перевищує €1000!');
+        return;
+      }
+      state.coins.safe.current = state.coins.safe.invested;
+      state.coins.trend.current = state.coins.trend.invested;
+      state.coins.risky.current = state.coins.risky.invested;
+      render();
+    }
+
+    function startGame() {
+      if (totalInvested() === 0) { alert('Розподіліть кошти!'); return; }
+      state.started = true;
+      render();
+      alert('Симуляцію розпочато!');
+    }
+
+    function applyEvent() {
+      if (!state.started) { alert('Натисніть "Почати"!'); return; }
+      const s = Number(document.getElementById('safePercent').value || 0);
+      const t = Number(document.getElementById('trendPercent').value || 0);
+      const r = Number(document.getElementById('riskyPercent').value || 0);
+      
+      state.coins.safe.current *= (1 + s/100); state.coins.safe.lastChange = s;
+      state.coins.trend.current *= (1 + t/100); state.coins.trend.lastChange = t;
+      state.coins.risky.current *= (1 + r/100); state.coins.risky.lastChange = r;
+      
+      document.getElementById('safePercent').value = '';
+      document.getElementById('trendPercent').value = '';
+      document.getElementById('riskyPercent').value = '';
+      render();
+    }
+
+    function transfer() {
+      const from = document.getElementById('fromCoin').value;
+      const to = document.getElementById('toCoin').value;
+      const amt = Number(document.getElementById('transferAmount').value || 0);
+      if (from === to || amt <= 0 || state.coins[from].current < amt) { alert('Помилка переказу'); return; }
+      state.coins[from].current -= amt;
+      state.coins[to].current += amt;
+      document.getElementById('transferAmount').value = '';
+      render();
+    }
+
+    function render() {
+      document.getElementById('safeCurrent').textContent = formatMoney(state.coins.safe.current);
+      document.getElementById('trendCurrent').textContent = formatMoney(state.coins.trend.current);
+      document.getElementById('riskyCurrent').textContent = formatMoney(state.coins.risky.current);
+      document.getElementById('safeChange').textContent = state.coins.safe.lastChange + '%';
+      document.getElementById('trendChange').textContent = state.coins.trend.lastChange + '%';
+      document.getElementById('riskyChange').textContent = state.coins.risky.lastChange + '%';
+      
+      const portfolio = totalCurrent();
+      const profit = portfolio - totalInvested();
+      document.getElementById('portfolioValue').textContent = formatMoney(portfolio);
+      const pEl = document.getElementById('profitValue');
+      pEl.textContent = formatMoney(profit);
+      pEl.className = 'stat-value ' + (profit >= 0 ? 'profit' : 'loss');
+      
+      document.getElementById('sumSafe').textContent = formatMoney(state.coins.safe.current);
+      document.getElementById('sumTrend').textContent = formatMoney(state.coins.trend.current);
+      document.getElementById('sumRisky').textContent = formatMoney(state.coins.risky.current);
+      document.getElementById('sumPortfolio').textContent = formatMoney(portfolio);
+      document.getElementById('sumProfit').textContent = formatMoney(profit);
+      document.getElementById('sumProfit').className = profit >= 0 ? 'profit' : 'loss';
+      document.getElementById('cashLeft').textContent = formatMoney(cashRemaining());
+      
+      document.getElementById('safeInput').disabled = state.started;
+      document.getElementById('trendInput').disabled = state.started;
+      document.getElementById('riskyInput').disabled = state.started;
+      saveState();
+    }
+
+    document.querySelectorAll('input[id$="Input"]').forEach(i => i.addEventListener('input', updateAllocation));
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('applyEventBtn').addEventListener('click', applyEvent);
+    document.getElementById('transferBtn').addEventListener('click', transfer);
+    document.getElementById('resetBtn').addEventListener('click', () => { sessionStorage.clear(); location.reload(); });
+    render();
+  </script>
+</body>
+</html>
